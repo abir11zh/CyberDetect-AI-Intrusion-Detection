@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CyberDetect AI — Intelligent Network Intrusion Detection</title>
+  <meta name="description"
+    content="CyberDetect AI uses XGBoost and LSTM deep learning models to detect network cyberattacks in real time. Master's AI project." />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+
+  <!-- ══════════════ NAVBAR ══════════════ -->
+  <nav class="navbar" role="navigation" aria-label="Main navigation">
+    <a href="index.html" class="nav-brand">
+      <div class="brand-icon">🛡️</div>
+      <span>Cyber<em>Detect</em> AI</span>
+    </a>
+
+    <ul class="nav-links" id="nav-links">
+      <li><a href="index.html" class="active">Home</a></li>
+      <li><a href="prediction.html">Prediction</a></li>
+      <li><a href="visualization.html">Visualization</a></li>
+    </ul>
+
+    <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- ══════════════ HERO ══════════════ -->
+  <section class="hero" aria-labelledby="hero-heading">
+    <!-- Security Spirit Background Animation -->
+    <div class="security-bg">
+      <div class="scanline"></div>
+      <div class="grid-animation"></div>
+      <div class="data-particles">
+        <span style="top:10%; left:20%; animation-delay:0s;">01101011</span>
+        <span style="top:30%; left:80%; animation-delay:2s;">0x7F2A</span>
+        <span style="top:70%; left:15%; animation-delay:4s;">001101</span>
+        <span style="top:50%; left:60%; animation-delay:1s;">0xFF00</span>
+        <span style="top:85%; left:45%; animation-delay:3s;">11001010</span>
+      </div>
+    </div>
+
+    <div class="hero-inner">
+      <div class="hero-badge animate-on-scroll">
+        Master AI Project · IDS Research
+      </div>
+
+      <h1 id="hero-heading">
+        Detect Cyber Threats<br>
+        with <span class="gradient-text">AI Precision</span>
+      </h1>
+
+      <p class="hero-desc">
+        CyberDetect AI combines <strong>XGBoost</strong> and <strong>LSTM</strong>
+        neural networks to analyse network traffic and flag intrusions in
+        real time — delivering high accuracy with explainable predictions.
+      </p>
+
+      <div class="hero-actions">
+        <a href="prediction.html" class="btn btn-primary btn-lg">
+          Run Prediction
+        </a>
+        <a href="visualization.html" class="btn btn-secondary btn-lg">
+          Explore Data
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ DASHBOARD OVERVIEW ══════════════ -->
+  <section class="section" id="dashboard" aria-labelledby="dashboard-heading">
+    <div class="container">
+      <div class="dashboard-header">
+        <span class="tech-label animate-on-scroll">MODULE: DASHBOARD_CORE_METRICS</span>
+        <h2 class="section-title" id="dashboard-heading">Model Performance Dashboard</h2>
+        <p class="section-desc">Real-time statistics and analysis of our trained Machine Learning and Deep Learning
+          models based on 1.56M+ network traffic packets.</p>
+      </div>
+
+      <!-- KPI Grid -->
+      <div class="kpi-grid animate-on-scroll">
+        <div class="kpi-card stagger-1">
+          <div class="kpi-content">
+            <h3 class="kpi-value">1.56M+</h3>
+            <p class="kpi-label">Training Samples</p>
+          </div>
+        </div>
+        <div class="kpi-card stagger-2">
+          <div class="kpi-content">
+            <h3 class="kpi-value">91.1%</h3>
+            <p class="kpi-label">Best Acc. (MLP)</p>
+          </div>
+        </div>
+        <div class="kpi-card stagger-3">
+          <div class="kpi-content">
+            <h3 class="kpi-value">92.0%</h3>
+            <p class="kpi-label">Best Recall (CatBoost)</p>
+          </div>
+        </div>
+        <div class="kpi-card stagger-4">
+          <div class="kpi-content">
+            <h3 class="kpi-value">7</h3>
+            <p class="kpi-label">Optimized Features</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Dashboard Grid -->
+      <div class="dashboard-main-grid mt-4">
+        <!-- Chart Column -->
+        <div class="dashboard-chart-panel card animate-on-scroll">
+          <div class="panel-header mb-3">
+            <h3 class="panel-title">Performance Comparison</h3>
+            <span class="badge badge-primary">Test Set</span>
+          </div>
+          <div class="chart-container" style="position: relative; height:360px; width:100%">
+            <canvas id="homeModelChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Analytics Table Column -->
+        <div class="dashboard-analytics-panel card animate-on-scroll stagger-1">
+          <div class="panel-header mb-3">
+            <h3 class="panel-title">Model Diagnostics</h3>
+            <span class="badge badge-outline">Detailed View</span>
+          </div>
+          <div class="table-responsive">
+            <table class="dashboard-table">
+              <thead>
+                <tr>
+                  <th>Model</th>
+                  <th>Recall</th>
+                  <th>Precision</th>
+                  <th>Verdict</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="animate-on-scroll stagger-1">
+                  <td><strong>XGBoost</strong></td>
+                  <td>90.0%</td>
+                  <td>73.0%</td>
+                  <td><span class="badge badge-success">Excellent</span></td>
+                </tr>
+                <tr class="animate-on-scroll stagger-2">
+                  <td><strong>CatBoost</strong></td>
+                  <td>91.6%</td>
+                  <td>71.0%</td>
+                  <td><span class="badge badge-warning">Max Security</span></td>
+                </tr>
+                <tr class="animate-on-scroll stagger-3">
+                  <td><strong>Random Forest</strong></td>
+                  <td>92.0%</td>
+                  <td>72.0%</td>
+                  <td><span class="badge badge-info">Robust</span></td>
+                </tr>
+                <tr class="animate-on-scroll stagger-4">
+                  <td><strong>MLP Optimized</strong></td>
+                  <td>67.8%</td>
+                  <td>91.1%</td>
+                  <td><span class="badge badge-primary">High Accuracy</span></td>
+                </tr>
+                <tr class="animate-on-scroll stagger-5">
+                  <td><strong>Isolation Forest</strong></td>
+                  <td>25.0%</td>
+                  <td>43.0%</td>
+                  <td><span class="badge badge-danger">High FP</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Secondary Dashboard Grid (Doughnut + Features) -->
+      <div class="dashboard-secondary-grid">
+
+        <!-- Dataset Breakdown Chart -->
+        <div class="dashboard-chart-panel card animate-on-scroll">
+          <div class="panel-header mb-3">
+            <h3 class="panel-title">Training Data Distribution</h3>
+            <span class="badge badge-outline">CIC-IDS-2017</span>
+          </div>
+          <div class="chart-container"
+            style="position: relative; height:280px; width:100%; display: flex; justify-content: center;">
+            <canvas id="attackDistributionChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Top Features List -->
+        <div class="dashboard-analytics-panel card animate-on-scroll stagger-1">
+          <div class="panel-header mb-3">
+            <h3 class="panel-title">Top Influential Features</h3>
+            <span class="badge badge-primary">XGBoost SHAP</span>
+          </div>
+          <div class="feature-list">
+
+            <div class="feat-item">
+              <div class="feat-header">
+                <span>1. Destination Port</span>
+                <span class="feat-score">100%</span>
+              </div>
+              <div class="feat-track">
+                <div class="feat-bar" style="width: 100%;"></div>
+              </div>
+            </div>
+
+            <div class="feat-item">
+              <div class="feat-header">
+                <span>2. Flow Duration</span>
+                <span class="feat-score">84%</span>
+              </div>
+              <div class="feat-track">
+                <div class="feat-bar" style="width: 84%; opacity: 0.9;"></div>
+              </div>
+            </div>
+
+            <div class="feat-item">
+              <div class="feat-header">
+                <span>3. Packet Length Mean</span>
+                <span class="feat-score">76%</span>
+              </div>
+              <div class="feat-track">
+                <div class="feat-bar" style="width: 76%; opacity: 0.8;"></div>
+              </div>
+            </div>
+
+            <div class="feat-item">
+              <div class="feat-header">
+                <span>4. IAT Standard Deviation</span>
+                <span class="feat-score">62%</span>
+              </div>
+              <div class="feat-track">
+                <div class="feat-bar" style="width: 62%; opacity: 0.7;"></div>
+              </div>
+            </div>
+
+            <div class="feat-item">
+              <div class="feat-header">
+                <span>5. Total Fwd Packets</span>
+                <span class="feat-score">45%</span>
+              </div>
+              <div class="feat-track">
+                <div class="feat-bar" style="width: 45%; opacity: 0.6;"></div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════════ FEATURES ══════════════ -->
+  <section class="section section-alt" id="features" aria-labelledby="features-heading">
+    <div class="container">
+      <p class="section-label">Features</p>
+      <h2 class="section-title" id="features-heading">What CyberDetect AI Offers</h2>
+      <p class="section-desc">
+        A complete pipeline from raw network flow to actionable threat intelligence.
+      </p>
+
+      <div class="grid-3">
+
+        <div class="card feature-card">
+          <h3 class="card-title">Real-Time Detection</h3>
+          <p class="card-text">
+            Classify network flows on-the-fly with sub-second inference latency
+            using optimised XGBoost inference pipelines.
+          </p>
+        </div>
+
+        <div class="card feature-card">
+          <h3 class="card-title">Temporal Analysis</h3>
+          <p class="card-text">
+            LSTM models capture time-series patterns in traffic, detecting
+            slow-burn attacks that single-packet classifiers miss.
+          </p>
+        </div>
+
+        <div class="card feature-card">
+          <h3 class="card-title">High Accuracy</h3>
+          <p class="card-text">
+            Ensemble voting over XGBoost + LSTM yields &gt;97 % F1-score
+            on the CIC-IDS-2017 benchmark dataset.
+          </p>
+        </div>
+
+        <div class="card feature-card">
+          <h3 class="card-title">Explainable AI</h3>
+          <p class="card-text">
+            SHAP values and feature importance rankings make every
+            prediction interpretable for security analysts.
+          </p>
+        </div>
+
+        <div class="card feature-card">
+          <h3 class="card-title">Multi-attack Coverage</h3>
+          <p class="card-text">
+            Detects DDoS, Port Scan, Brute Force, SQL Injection,
+            Reconnaissance, Man-in-the-Middle, and more.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ FOOTER ══════════════ -->
+  <footer>
+    <p>
+      <strong>CyberDetect AI</strong> — Master's AI Project &nbsp;·&nbsp;
+      Built with ❤️ using XGBoost &amp; LSTM &nbsp;·&nbsp;
+      <a href="visualization.html">Data Visualization</a> &nbsp;|&nbsp;
+      <a href="prediction.html">Prediction Demo</a>
+    </p>
+    <p style="margin-top:.5rem;font-size:.8rem;opacity:.7;">
+      Dataset: CIC-IDS-2017 · Framework: scikit-learn, TensorFlow · 2026
+    </p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="js/main.js"></script>
+</body>
+
+</html>

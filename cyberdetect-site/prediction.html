@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Prediction — CyberDetect AI</title>
+  <meta name="description"
+    content="Test the CyberDetect AI prediction engine. Enter network flow parameters and receive an instant attack / normal classification from XGBoost and LSTM models." />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+
+  <!-- ══════════════ NAVBAR ══════════════ -->
+  <nav class="navbar" role="navigation" aria-label="Main navigation">
+    <a href="index.html" class="nav-brand">
+      <div class="brand-icon">🛡️</div>
+      <span>Cyber<em>Detect</em> AI</span>
+    </a>
+
+    <ul class="nav-links" id="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="prediction.html" class="active">Prediction</a></li>
+      <li><a href="visualization.html">Visualization</a></li>
+    </ul>
+
+    <button class="nav-toggle" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- ══════════════ PAGE HERO ══════════════ -->
+  <section class="page-hero" aria-labelledby="pred-heading">
+    <div class="mesh-gradient"></div>
+    <span class="tech-label" style="color:rgba(255,255,255,0.5);margin-bottom:0.8rem;">ENGINE_PATH:
+      CORE_INFERENCE_UNIT_X14</span>
+    <h1 class="section-title" id="pred-heading" style="color:rgba(37, 100, 235, 0.855);">Run a Network Flow Prediction
+    </h1>
+    <p style="color:var(--text-muted);max-width:520px;margin:0 auto;">
+      Enter the parameters of a network connection and our ensemble model
+      (XGBoost + LSTM) will classify it in real time.
+    </p>
+  </section>
+
+  <!-- ══════════════ FORM ══════════════ -->
+  <section class="section" style="padding-top:1.5rem;">
+    <div class="container">
+
+      <div class="form-card" role="form" aria-labelledby="form-title">
+        <span class="tech-label" style="margin-bottom:1rem; opacity:0.6;">DESCRIPTOR: FEATURE_VECTOR_INPUT</span>
+        <h2 class="form-title" id="form-title">
+        </h2>
+
+        <form id="prediction-form" novalidate>
+          <div class="form-grid">
+
+            <!-- Source IP -->
+            <div class="form-group">
+              <label for="src-ip">Source IP Address</label>
+              <input id="src-ip" type="text" placeholder="e.g. 192.168.1.42" pattern="^(\d{1,3}\.){3}\d{1,3}$" required
+                aria-required="true" />
+            </div>
+
+            <!-- Destination IP -->
+            <div class="form-group">
+              <label for="dst-ip">Destination IP Address</label>
+              <input id="dst-ip" type="text" placeholder="e.g. 10.0.0.1" pattern="^(\d{1,3}\.){3}\d{1,3}$" required
+                aria-required="true" />
+            </div>
+
+            <!-- Packet Size -->
+            <div class="form-group">
+              <label for="packet-size">Packet Size (bytes)</label>
+              <input id="packet-size" type="number" placeholder="e.g. 512" min="1" max="65535" required
+                aria-required="true" />
+            </div>
+
+            <!-- Protocol -->
+            <div class="form-group">
+              <label for="protocol">Protocol</label>
+              <select id="protocol" required aria-required="true">
+                <option value="" disabled selected>Select protocol…</option>
+                <option value="TCP">TCP</option>
+                <option value="UDP">UDP</option>
+                <option value="ICMP">ICMP</option>
+                <option value="HTTP">HTTP</option>
+                <option value="HTTPS">HTTPS</option>
+                <option value="DNS">DNS</option>
+                <option value="FTP">FTP</option>
+                <option value="SSH">SSH</option>
+              </select>
+            </div>
+
+            <!-- Connection Duration -->
+            <div class="form-group full">
+              <label for="duration">Connection Duration (seconds)</label>
+              <input id="duration" type="number" placeholder="e.g. 3.75" min="0" step="0.01" required
+                aria-required="true" />
+            </div>
+
+          </div><!-- /.form-grid -->
+
+          <div class="form-actions" style="gap: 1rem; flex-wrap: wrap;">
+            <button type="button" class="btn btn-primary btn-lg" id="random-btn">
+              Randomize Parameters
+            </button>
+            <button type="submit" class="btn btn-primary btn-lg" id="submit-btn" style="flex: 1; min-width: 200px;">
+              Run Prediction
+            </button>
+          </div>
+        </form>
+      </div><!-- /.form-card -->
+
+      <!-- ══════════════ RESULT CARD ══════════════ -->
+      <div class="result-card" id="result-card" role="region" aria-live="polite" aria-label="Prediction result"
+        style="max-width: 860px;">
+
+        <div class="result-header">
+          <h3> Ensemble Prediction Result</h3>
+          <span class="risk-badge" id="risk-badge">— Risk</span>
+        </div>
+
+        <div class="result-body" style="padding: 0;">
+          <div class="prediction-split">
+            <!-- XGBoost Results -->
+            <div class="pred-panel xgb-panel" style="padding: 1.8rem; border-right: 1px solid var(--border);">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
+                <h4
+                  style="color: var(--primary); font-size: 1.05rem; display: flex; align-items: center; gap: .5rem; margin: 0;">
+                  XGBoost Model
+                </h4>
+                <span class="badge badge-outline" id="res-xgb-time">Inference: 0.8ms</span>
+              </div>
+
+              <div class="result-item" style="margin-bottom: 1rem;">
+                <div class="result-item-label">Prediction Status</div>
+                <div class="result-item-value" id="res-xgb-status" style="font-size: 1.2rem;">—</div>
+              </div>
+
+              <div class="result-grid" style="grid-template-columns: 1fr;">
+                <div class="result-item">
+                  <div class="result-item-label">Detected Attack</div>
+                  <div class="result-item-value" id="res-xgb-attack">—</div>
+                </div>
+                <div class="result-item">
+                  <div class="result-item-label">Confidence Score</div>
+                  <div class="result-item-value" id="res-xgb-conf">—</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- LSTM Results -->
+            <div class="pred-panel lstm-panel" style="padding: 1.8rem; background: rgba(6,182,212,.03);">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
+                <h4
+                  style="color: var(--accent); font-size: 1.05rem; display: flex; align-items: center; gap: .5rem; margin: 0;">
+                  LSTM Neural Net
+                </h4>
+                <span class="badge badge-outline" id="res-lstm-time">Inference: 12.4ms</span>
+              </div>
+
+              <div class="result-item" style="margin-bottom: 1rem;">
+                <div class="result-item-label">Prediction Status</div>
+                <div class="result-item-value" id="res-lstm-status" style="font-size: 1.2rem;">—</div>
+              </div>
+
+              <div class="result-grid" style="grid-template-columns: 1fr;">
+                <div class="result-item">
+                  <div class="result-item-label">Detected Attack</div>
+                  <div class="result-item-value" id="res-lstm-attack">—</div>
+                </div>
+                <div class="result-item">
+                  <div class="result-item-label">Confidence Score</div>
+                  <div class="result-item-value" id="res-lstm-conf">—</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div><!-- /.result-body -->
+
+      </div><!-- /.result-card -->
+
+    </div><!-- /.container -->
+  </section>
+
+  <!-- ══════════════ PREDICTION HISTORY ══════════════ -->
+  <section class="section" id="history-section" style="display: none; padding-top: 1rem; padding-bottom: 2rem;">
+    <div class="container">
+      <div class="dashboard-header" style="margin-bottom: 2rem; text-align: left;">
+        <h2 class="section-title" style="font-size: 1.8rem;">Session History & Analysis</h2>
+      </div>
+
+      <div class="dashboard-main-grid">
+        <!-- History Table -->
+        <div class="dashboard-analytics-panel card" style="overflow: hidden; padding: 0;">
+          <div class="panel-header mb-3" style="padding: 1.5rem 1.5rem 0;">
+            <h3 class="panel-title">Recent Predictions</h3>
+          </div>
+          <div class="table-responsive" style="max-height: 320px; overflow-y: auto;">
+            <table class="dashboard-table" id="history-table">
+              <thead>
+                <tr>
+                  <th>Time</th>
+                  <th>Src IP</th>
+                  <th>Protocol</th>
+                  <th>XGBoost</th>
+                  <th>LSTM</th>
+                  <th>Risk</th>
+                </tr>
+              </thead>
+              <tbody id="history-tbody">
+                <!-- Rows will be added dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- History Chart -->
+        <div class="dashboard-chart-panel card">
+          <div class="panel-header mb-3">
+            <h3 class="panel-title">Detection Comparison</h3>
+          </div>
+          <div class="chart-container" style="position: relative; height:300px; width:100%">
+            <canvas id="historyChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ INFO CARDS ══════════════ -->
+  <section class="section section-alt" aria-labelledby="models-heading">
+    <div class="container">
+      <p class="section-label">How It Works</p>
+      <h2 class="section-title" id="models-heading">The Models Behind the Prediction</h2>
+      <p class="section-desc">
+        Each inference runs through both models; the ensemble picks the highest-confidence class.
+      </p>
+      <div class="grid-2">
+
+        <div class="card">
+          <h3 class="card-title">XGBoost Classifier</h3>
+          <p class="card-text">
+            Trained on 80 hand-crafted features (flow duration, packet length stats,
+            IAT mean/std, flag counts…). Extremely fast inference (&lt;1 ms per flow).
+            Handles class imbalance via scale_pos_weight tuning.
+          </p>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">LSTM Neural Network</h3>
+          <p class="card-text">
+            Processes sliding windows of 20 consecutive packets to capture temporal
+            dependencies. Two-layer stacked LSTM with attention mechanism.
+            Best suited for slow-scan and low-and-slow attack detection.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ FOOTER ══════════════ -->
+  <footer>
+    <p>
+      <strong>CyberDetect AI</strong> — Master's AI Project &nbsp;·&nbsp;
+      Built with ❤️ using XGBoost &amp; LSTM &nbsp;·&nbsp;
+      <a href="index.html">Home</a> &nbsp;|&nbsp;
+      <a href="visualization.html">Data Visualization</a>
+    </p>
+    <p style="margin-top:.5rem;font-size:.8rem;opacity:.7;">
+      Dataset: CIC-IDS-2017 · Framework: scikit-learn, TensorFlow · 2026
+    </p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="js/main.js"></script>
+</body>
+
+</html>

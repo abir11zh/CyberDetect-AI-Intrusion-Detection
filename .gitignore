@@ -1,0 +1,20 @@
+# Generated datasets and captures
+projet python/data/
+projet python/benign/
+projet python/recon/
+projet python/projet python/recon/
+*.pcap
+# Python artifacts
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+# Virtual environments
+venv/
+.venv/
+env/
+# Secrets
+.env
+.env.*
+# IDE
+.vscode/
+.idea/

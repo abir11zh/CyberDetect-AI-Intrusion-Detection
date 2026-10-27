@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Data Visualization — CyberDetect AI</title>
+  <meta name="description"
+    content="Interactive network traffic charts: line graph of traffic over time, pie chart of attack types, and histogram of packet size distribution." />
+  <link rel="stylesheet" href="css/style.css" />
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+  <!-- Chart.js Annotation Plugin -->
+  <script
+    src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+  <!-- Chart.js Matrix Plugin -->
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-matrix@2.0.1/dist/chartjs-chart-matrix.min.js"></script>
+</head>
+
+<body>
+
+  <!-- ══════════════ NAVBAR ══════════════ -->
+  <nav class="navbar" role="navigation" aria-label="Main navigation">
+    <a href="index.html" class="nav-brand">
+      <div class="brand-icon">🛡️</div>
+      <span>Cyber<em>Detect</em> AI</span>
+    </a>
+
+    <ul class="nav-links" id="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="prediction.html">Prediction</a></li>
+      <li><a href="visualization.html" class="active">Visualization</a></li>
+    </ul>
+
+    <button class="nav-toggle" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- ══════════════ PAGE HERO ══════════════ -->
+  <section class="page-hero" aria-labelledby="viz-heading">
+    <div class="mesh-gradient"></div>
+    <span class="tech-label" style="color:rgba(255,255,255,0.5);margin-bottom:0.5rem;">SUBSYSTEM:
+      ANALYTICS_ENGINE_V4</span>
+    <h1 class="section-title" id="viz-heading" style="color:rgba(37, 100, 235, 0.855);">Network Traffic Analytics</h1>
+    <p style="color:var(--text-muted);max-width:560px;margin:0 auto;">
+      Interactive charts built from the CIC-IDS-2017 dataset.
+      Hover over any graph for detailed tooltips.
+    </p>
+  </section>
+
+  <!-- ══════════════ STATS ROW ══════════════ -->
+  <section class="section" style="padding-top:2rem;padding-bottom:0;">
+    <div class="container">
+      <div class="stats-row">
+
+        <div class="stat-mini">
+          <div>
+            <div class="stat-mini-value">16.2 K</div>
+            <div class="stat-mini-label">Total Packets Analysed</div>
+          </div>
+        </div>
+
+        <div class="stat-mini">
+          <div>
+            <div class="stat-mini-value">1 337</div>
+            <div class="stat-mini-label">Attack Events Detected</div>
+          </div>
+        </div>
+
+        <div class="stat-mini">
+          <div>
+            <div class="stat-mini-value">7</div>
+            <div class="stat-mini-label">Attack Categories</div>
+          </div>
+        </div>
+
+        <div class="stat-mini">
+          <div>
+            <div class="stat-mini-value">97.3%</div>
+            <div class="stat-mini-label">Detection Accuracy</div>
+          </div>
+        </div>
+
+        <div class="stat-mini">
+          <div>
+            <div class="stat-mini-value">&lt;1 ms</div>
+            <div class="stat-mini-label">Avg Inference Time</div>
+          </div>
+        </div>
+
+      </div><!-- /.stats-row -->
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:2rem;" aria-labelledby="charts-heading">
+    <div class="container">
+      <div class="dashboard-header" style="text-align:left;margin-bottom:2rem;">
+        <span class="tech-label">CORE_METRICS // TRAFFIC_OVERVIEW</span>
+        <h2 class="section-title" id="charts-heading" style="margin-bottom:0;">Interactive Charts</h2>
+      </div>
+
+      <div class="charts-grid">
+
+        <!-- 1. Line Chart — Traffic over time -->
+        <div class="chart-card chart-wide">
+          <div class="chart-card-header">
+            <h3>
+              Network Traffic Over Time
+            </h3>
+            <span class="chart-badge">Line Chart · 24 h</span>
+          </div>
+          <div class="chart-body">
+            <canvas id="lineChart" height="90" aria-label="Line chart showing network traffic over 24 hours"
+              role="img"></canvas>
+          </div>
+          <p class="chart-description">Surveille le volume de paquets réseau seconde par seconde. Un pic soudain (ex:
+            1250 pkts/s) indique souvent une attaque par déni de service (DDoS).</p>
+        </div>
+
+        <!-- 2. Pie / Donut — Attack types -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <h3>
+              Attack Type Distribution
+            </h3>
+            <span class="chart-badge">Donut Chart</span>
+          </div>
+          <div class="chart-body">
+            <canvas id="pieChart" aria-label="Donut chart of attack types" role="img"></canvas>
+          </div>
+          <p class="chart-description">Répartition globale des différentes catégories d'attaques détectées dans le
+            dataset d'entraînement. Le DDoS est la menace dominante.</p>
+        </div>
+
+        <!-- 3. Histogram — Packet size -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <h3>
+              Packet Size Distribution
+            </h3>
+            <span class="chart-badge">Histogram</span>
+          </div>
+          <div class="chart-body">
+            <canvas id="histogramChart" aria-label="Histogram of packet size distribution" role="img"></canvas>
+          </div>
+          <p class="chart-description">Visualise la taille moyenne des paquets (en octets). Les attaquants modifient
+            souvent la tamaño (petits pings ou énormes payloads) pour contourner les filtres.</p>
+        </div>
+
+      </div><!-- /.charts-grid -->
+    </div>
+  </section>
+
+  <!-- ══════════════ AI MODEL CHARTS ══════════════ -->
+  <section class="section" style="padding-top:2rem;" aria-labelledby="ai-charts-heading">
+    <div class="container">
+      <h2 class="section-title" id="ai-charts-heading" style="margin-bottom:0;">AI Model Analysis</h2>
+      <p style="color:var(--text-muted);margin-bottom:2rem;">Deep-dive into the features and predictions of our AI
+        models.</p>
+
+      <div class="charts-grid">
+
+        <!-- 4. Scatter Plot — Feature separation -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <h3>
+              Feature Separation
+            </h3>
+            <span class="chart-badge">Scatter Pattern</span>
+          </div>
+          <div class="chart-body">
+            <canvas id="scatterChart" aria-label="Scatter plot for feature separation" role="img"></canvas>
+          </div>
+          <p class="chart-description">Démontre la capacité de séparation vectorielle des modèles. Le trafic malveillant
+            est isolé du trafic normal dans cet espace bidimensionnel.</p>
+        </div>
+
+        <!-- 5. Line Chart — LSTM Anomaly -->
+        <div class="chart-card chart-wide">
+          <div class="chart-card-header">
+            <h3>
+              LSTM Anomaly Detection
+            </h3>
+            <span class="chart-badge">MSE Errors</span>
+          </div>
+          <div class="chart-body">
+            <canvas id="lstmErrorChart" height="90" aria-label="Line chart of LSTM MSE errors" role="img"></canvas>
+          </div>
+          <p class="chart-description">Suivi séquentiel du modèle LSTM. Tout point dépassant la ligne de seuil d'alerte
+            rouge est classifié de manière autonome comme une anomalie grave.</p>
+        </div>
+
+        <!-- 6. Grouped Bar Chart — Model Comparison -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <h3>
+              Model Comparison
+            </h3>
+            <span class="chart-badge">Grouped Bar</span>
+          </div>
+          <div class="chart-body">
+            <canvas id="modelComparisonChart" aria-label="Grouped bar chart of model performance" role="img"></canvas>
+          </div>
+          <p class="chart-description">Comparatif direct des 3 architectures testées (Machine Learning, Deep Learning,
+            Non-supervisé). XGBoost offre l'équilibre optimal Recall/Accuracy.</p>
+        </div>
+
+      </div><!-- /.charts-grid -->
+    </div>
+  </section>
+
+  <!-- ══════════════ ADVANCED MODEL INSIGHTS ══════════════ -->
+  <section class="section" style="padding-top:2rem;" aria-labelledby="advanced-insights-heading">
+    <div class="container">
+      <h2 class="section-title" id="advanced-insights-heading" style="margin-bottom:0;">Advanced Model Insights</h2>
+      <p style="color:var(--text-muted);margin-bottom:2rem;">Explore deeper metrics, confidence scores, and real-time
+        processing indicators.</p>
+
+      <div class="charts-grid">
+
+        <!-- 7. Radar Chart — Model Performance Comparison -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <h3>
+              Performance Radar
+            </h3>
+            <span class="chart-badge">Radar Chart</span>
+          </div>
+          <div class="chart-body">
+            <canvas id="modelRadarChart" aria-label="Radar chart comparing model performance metrics"
+              role="img"></canvas>
+          </div>
+          <p class="chart-description">Analyse multidimensionnelle des forces de l'XGBoost face au LSTM sur 4 métriques
+            critiques : Précision, Rappel (Recall), Justesse (Accuracy) et F1-Score.</p>
+        </div>
+
+        <!-- 8. Horizontal Bar — Top Targeted Topics -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <h3>
+              Top Targeted Topics
+            </h3>
+            <span class="chart-badge">Horizontal Bar</span>
+          </div>
+          <div class="chart-body">
+            <canvas id="targetedTopicsChart" aria-label="Horizontal bar chart of top targeted MQTT topics"
+              role="img"></canvas>
+          </div>
+          <p class="chart-description">Classement des "Topics" (capteurs/télémétrie) les plus saturés par les attaques
+            au niveau réseau, utile pour prioriser le durcissement.</p>
+        </div>
+
+        <!-- 9. KDE/Histogram — Message Value Analysis -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <h3>
+              LSTM Input Distribution
+            </h3>
+            <span class="chart-badge">Histogram</span>
+          </div>
+          <div class="chart-body">
+            <canvas id="messageValueChart" aria-label="Histogram of LSTM input message values" role="img"></canvas>
+          </div>
+          <p class="chart-description">Outil de diagnostic du modèle LSTM, montrant comment les messages "Attaques" se
+            concentrent sur des valeurs normalisées extrêmes (0.8 - 1.0).</p>
+        </div>
+
+        <!-- 10. Density Plot — Confidence Score Distribution -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <h3>
+              Confidence Distribution
+            </h3>
+            <span class="chart-badge">Density Plot</span>
+          </div>
+          <div class="chart-body">
+            <canvas id="confidenceScoreChart"
+              aria-label="Line chart comparing XGBoost and LSTM confidence distributions" role="img"></canvas>
+          </div>
+          <p class="chart-description">Mesure de la certitude prédictive. L'XGBoost (en bleu) démontre une "confiance
+            absolue" radicale (proche de 1.0) comparée à la courbe plus diffuse du LSTM.</p>
+        </div>
+
+        <!-- 11. Line Chart — Prediction Latency -->
+        <div class="chart-card chart-wide">
+          <div class="chart-card-header">
+            <h3>
+              Prediction Latency
+            </h3>
+            <span class="chart-badge">Latency ms</span>
+          </div>
+          <div class="chart-body">
+            <canvas id="predictionLatencyChart" height="90"
+              aria-label="Chart showing model prediction latency over events" role="img"></canvas>
+          </div>
+          <p class="chart-description">Mesure de performance système vitale pour un IDS en temps réel. La latence
+            moyenne d'inférence reste sous le seuil critique des 50 millisecondes.</p>
+        </div>
+
+      </div><!-- /.charts-grid -->
+    </div>
+  </section>
+
+  <!-- ══════════════ EVALUATION METRICS ══════════════ -->
+  <section class="section" style="padding-top:2rem;" aria-labelledby="evaluation-heading">
+    <div class="container">
+      <div class="dashboard-header" style="text-align:left;margin-bottom:2rem;">
+        <span class="tech-label">MODEL_QUALITY // VALIDATION_SUITE</span>
+        <h2 class="section-title" id="evaluation-heading" style="margin-bottom:0;">Evaluation Metrics</h2>
+        <p style="color:var(--text-muted);margin-bottom:0;">Rigorous model validation using ROC curves, Precision-Recall
+          curves, and a Confusion Matrix.</p>
+      </div>
+
+      <div class="charts-grid">
+
+        <!-- 12. Line Chart — ROC Curve -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <h3>
+              ROC Curve
+            </h3>
+            <span class="chart-badge">FPR vs TPR</span>
+          </div>
+          <div class="chart-body">
+            <canvas id="rocCurveChart" aria-label="ROC curve showing True Positive Rate against False Positive Rate"
+              role="img"></canvas>
+          </div>
+          <p class="chart-description">Évalue la robustesse globale. Une aire sous la courbe (AUC) proche de 1.0
+            (XGBoost) indique un modèle parfait, minimisant les fausses alertes.</p>
+        </div>
+
+        <!-- 13. Line Chart — Precision-Recall -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <h3>
+              Precision-Recall Curve
+            </h3>
+            <span class="chart-badge">PR Curve</span>
+          </div>
+          <div class="chart-body">
+            <canvas id="prCurveChart" aria-label="Precision-Recall curve for model evaluation" role="img"></canvas>
+          </div>
+          <p class="chart-description">Crucial pour les datasets déséquilibrés. Montre comment la précision chute
+            lorsqu'on force le modèle à détecter (rappeler) un maximum d'attaques.</p>
+        </div>
+
+        <!-- 14. Matrix — Confusion Matrix -->
+        <div class="chart-card chart-wide">
+          <div class="chart-card-header">
+            <h3>
+              Confusion Matrix (XGBoost)
+            </h3>
+            <span class="chart-badge">Heatmap</span>
+          </div>
+          <div class="chart-body" style="display:flex; justify-content:center; align-items:center;">
+            <canvas id="confusionMatrixChart" style="max-width: 400px; max-height: 400px;"
+              aria-label="Normalized heatmap" role="img"></canvas>
+          </div>
+          <p class="chart-description">Heatmap des décisions de XGBoost. Confirme visuellement l'excellent taux de Vrais
+            Positifs (95%) contre un très faible taux de Faux Positifs (2%).</p>
+        </div>
+
+      </div><!-- /.charts-grid -->
+    </div>
+  </section>
+
+  <!-- ══════════════ NETWORK & FEATURE ANALYTICS ══════════════ -->
+  <section class="section" style="padding-top:2rem;" aria-labelledby="network-heading">
+    <div class="container">
+      <div class="dashboard-header" style="text-align:left;margin-bottom:2rem;">
+        <span class="tech-label">NETWORK_STRUCT // FEATURE_IMPORTANCE</span>
+        <h2 class="section-title" id="network-heading" style="margin-bottom:0;">Network & Feature Analytics</h2>
+        <p style="color:var(--text-muted);margin-bottom:0;">Explore the structural characteristics of the network
+          traffic and internal model variables.</p>
+      </div>
+
+      <div class="charts-grid">
+
+        <!-- 15. Bar Chart — Feature Importance -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <h3>
+              Feature Importance (XGBoost)
+            </h3>
+            <span class="chart-badge">Bar Chart</span>
+          </div>
+          <div class="chart-body">
+            <canvas id="featureImportanceChart" aria-label="Bar chart showing top impactful model features"
+              role="img"></canvas>
+          </div>
+          <p class="chart-description">Explicabilité du modèle : Le port de destination et la durée du flux sont les 2
+            variables pesant le plus lourd dans les décisions de l'algorithme XGBoost.</p>
+        </div>
+
+        <!-- 16. Polar Area — Protocol Distribution -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <h3>
+              Protocol Distribution
+            </h3>
+            <span class="chart-badge">Polar Area</span>
+          </div>
+          <div class="chart-body">
+            <canvas id="protocolDistributionChart" aria-label="Polar area chart of network protocols"
+              role="img"></canvas>
+          </div>
+          <p class="chart-description">Volume du trafic segmenté par protocole de transport. Le trafic TCP (bleu) domine
+            largement l'échantillon analysé.</p>
+        </div>
+
+        <!-- 17. Matrix — Correlation Matrix (Features) -->
+        <div class="chart-card chart-wide">
+          <div class="chart-card-header">
+            <h3>
+              Feature Correlation Matrix
+            </h3>
+            <span class="chart-badge">Heatmap</span>
+          </div>
+          <div class="chart-body" style="display:flex; justify-content:center; align-items:center; min-height:450px;">
+            <canvas id="correlationMatrixChart" aria-label="Feature correlation matrix heatmap" role="img"></canvas>
+          </div>
+          <p class="chart-description">Matrice de corrélation de Pearson entre les variables clés. Une corrélation
+            élevée (proche de 1.0 ou -1.0) indique des variables redondantes ou fortement liées au comportement
+            d'attaque.</p>
+        </div>
+
+        <!-- 18. Stacked Area — Attack Rate Over Time -->
+        <div class="chart-card chart-wide">
+          <div class="chart-card-header">
+            <h3>
+              Attack Rate Over Time
+            </h3>
+            <span class="chart-badge">Stacked Area</span>
+          </div>
+          <div class="chart-body">
+            <canvas id="attackRateChart" height="90"
+              aria-label="Stacked area chart of attack vs normal traffic over time" role="img"></canvas>
+          </div>
+          <p class="chart-description">Tendances macroscopiques sur 30 jours pointant l'injection de deux campagnes
+            distinctes d'attaques massives (zones rouges) au milieu d'un trafic de fond normal.</p>
+        </div>
+
+      </div><!-- /.charts-grid -->
+    </div>
+  </section>
+
+  <!-- ══════════════ DEEP LEARNING & FLOW ANALYTICS ══════════════ -->
+  <section class="section section-alt" style="padding-top:2rem;" aria-labelledby="dlflow-heading">
+    <div class="container">
+      <div class="dashboard-header" style="text-align:left;margin-bottom:2rem;">
+        <span class="tech-label">DEEP_LAYER // FLOW_MICRO_DYNAMICS</span>
+        <h2 class="section-title" id="dlflow-heading" style="margin-bottom:0;">Deep Learning & Flow Analytics</h2>
+        <p style="color:var(--text-muted);margin-bottom:0;">Insights extrêmes tirées des flux réseaux profonds et des
+          entraînements de nos modèles de Deep Learning.</p>
+      </div>
+
+      <div class="charts-grid">
+
+        <!-- 19. Line Chart — LSTM Training vs Validation Loss -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <h3>
+              LSTM Training vs Val Loss
+            </h3>
+            <span class="chart-badge">Line Chart</span>
+          </div>
+          <div class="chart-body">
+            <canvas id="lstmTrainingChart" aria-label="Line chart of LSTM loss over epochs" role="img"></canvas>
+          </div>
+          <p class="chart-description">Analyse de la convergence du modèle LSTM durant l'apprentissage. La courbe
+            confirme l'absence d'overfitting après la 30ème époque.</p>
+        </div>
+
+        <!-- 20. Scatter Chart — Flow Duration vs Packet Length -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <h3>
+              Duration vs Length
+            </h3>
+            <span class="chart-badge">Scatter Plot</span>
+          </div>
+          <div class="chart-body">
+            <canvas id="flowRelChart" aria-label="Scatter plot relating flow duration and length" role="img"></canvas>
+          </div>
+          <p class="chart-description">Corrélation entre la durée de connexion TCP et le volume transféré. Les points
+            isolés trahissent souvent l'exfiltration lente de données (Slowloris).</p>
+        </div>
+
+        <!-- 21. Bar Chart — TCP Flags -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <h3>
+              TCP Flags Distribution
+            </h3>
+            <span class="chart-badge">Bar Chart</span>
+          </div>
+          <div class="chart-body">
+            <canvas id="tcpFlagsChart" aria-label="Bar chart of TCP flags distribution" role="img"></canvas>
+          </div>
+          <p class="chart-description">Fréquence des drapeaux TCP (SYN, ACK, RST). Un volume anormalement élevé de SYN
+            reflète directement les attaques de scan réseau massives.</p>
+        </div>
+
+        <!-- 22. Horizontal Bar — Avg Size by Attack -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <h3>
+              Pkt Size by Attack Type
+            </h3>
+            <span class="chart-badge">Horiz. Bar</span>
+          </div>
+          <div class="chart-body">
+            <canvas id="avgSizeAttackChart" aria-label="Horizontal bar chart of packet size per attack"
+              role="img"></canvas>
+          </div>
+          <p class="chart-description">Impact de signature : Différence drastique entre des paquets Heartbleed (lourds)
+            contre ceux d'un port scan traditionnel (très légers).</p>
+        </div>
+
+        <!-- 23. Histogram — Flow Bytes/s -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <h3>
+              Flow Speed (Bytes/sec)
+            </h3>
+            <span class="chart-badge">Histogram</span>
+          </div>
+          <div class="chart-body">
+            <canvas id="flowBytesSpeedChart" aria-label="Histogram of flow speed" role="img"></canvas>
+          </div>
+          <p class="chart-description">Analyse de la vitesse de transfert réseau. Des vitesses saturées indiquent des
+            extractions de base de données réussies ou des attaques DoS volumétriques.</p>
+        </div>
+
+        <!-- 24. Bar Chart — TTL Analysis -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <h3>
+              TTL Distribution Analysis
+            </h3>
+            <span class="chart-badge">Bar Chart</span>
+          </div>
+          <div class="chart-body">
+            <canvas id="ttlAnalysisChart" aria-label="Chart showing Time-to-Live distribution" role="img"></canvas>
+          </div>
+          <p class="chart-description">Distribution du "Time-to-Live". Indique la topologie et distance des attaquants.
+            De nombreuses attaques proviennent d'adresses usurpées avec un TTL fixe (ex: 64).</p>
+        </div>
+
+        <!-- 25. Area Chart — Isolation Forest Anomaly -->
+        <div class="chart-card chart-wide">
+          <div class="chart-card-header">
+            <h3>
+              Isolation Forest Anomaly Scores
+            </h3>
+            <span class="chart-badge">Area Chart</span>
+          </div>
+          <div class="chart-body" style="height:250px;">
+            <canvas id="isolationForestChart" aria-label="Area chart of anomaly scores" role="img"></canvas>
+          </div>
+          <p class="chart-description">Visualisation crue du score d'anomalie (-1 à 1) de la forêt d'isolation non
+            supervisée, réagissant violemment aux comportements jamais vus ("Zero Day").</p>
+        </div>
+
+        <!-- 26. Doughnut — Fwd vs Bwd -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <h3>
+              Fwd vs Backward Flow
+            </h3>
+            <span class="chart-badge">Doughnut</span>
+          </div>
+          <div class="chart-body">
+            <canvas id="fwdBwdChart" aria-label="Doughnut comparing forward and backward packets" role="img"></canvas>
+          </div>
+          <p class="chart-description">Ratio de la direction du trafic. Une attaque de force brute asymétrique génère
+            typiquement des millions de requêtes Fwd pour très peu de réponses Bwd de l'Auth Server.</p>
+        </div>
+
+        <!-- 27. Pie Chart — Port Scan Target -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <h3>
+              Port Scan Vectors
+            </h3>
+            <span class="chart-badge">Pie Chart</span>
+          </div>
+          <div class="chart-body">
+            <canvas id="portScanPieChart" aria-label="Pie chart of targeted ports" role="img"></canvas>
+          </div>
+          <p class="chart-description">Aperçu direct du ciblage en aveugle lors d'un "Port Sweep". Les ports 80 (HTTP)
+            et 22 (SSH) restent sans surprise les cibles de choix des botnets.</p>
+        </div>
+
+      </div><!-- /.charts-grid -->
+    </div>
+  </section>
+
+  <!-- ══════════════ INSIGHT CARDS ══════════════ -->
+  <section class="section section-alt" aria-labelledby="insights-heading">
+    <div class="container">
+      <div class="dashboard-header" style="text-align:left;margin-bottom:2rem;">
+        <span class="tech-label">HEURISTIC_OUTPUT // BRAIN_REPORT</span>
+        <h2 class="section-title" id="insights-heading" style="margin-bottom:0;">What the Data Tells Us</h2>
+      </div>
+      <div class="grid-3" style="margin-top:1rem;">
+
+        <div class="card">
+          <h3 class="card-title">DDoS Peak at 11:00</h3>
+          <p class="card-text">
+            The traffic spike visible at 11:00 corresponds to a simulated DDoS burst
+            reaching 1 250 packets/s — nearly 1.4× the normal business-hours baseline.
+          </p>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">DDoS Dominates Attacks</h3>
+          <p class="card-text">
+            DDoS accounts for 28 % of all detected attack events, making it the
+            most prevalent threat, followed by Port Scan (18 %) and Brute Force (14 %).
+          </p>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">128–256 B Most Common</h3>
+          <p class="card-text">
+            The 128–256 byte packet-size bin has the highest volume (4 920 packets),
+            consistent with typical HTTP/S request header sizes in legitimate traffic.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ FOOTER ══════════════ -->
+  <footer>
+    <p>
+      <strong>CyberDetect AI</strong> — Master's AI Project &nbsp;·&nbsp;
+      Built with ❤️ using XGBoost &amp; LSTM &nbsp;·&nbsp;
+      <a href="index.html">Home</a> &nbsp;|&nbsp;
+      <a href="prediction.html">Prediction Demo</a>
+    </p>
+    <p style="margin-top:.5rem;font-size:.8rem;opacity:.7;">
+      Dataset: CIC-IDS-2017 · Charts: Chart.js v4 · 2026
+    </p>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/charts.js"></script>
+</body>
+
+</html>
